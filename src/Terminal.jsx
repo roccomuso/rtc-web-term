@@ -1,6 +1,7 @@
 import React, {Component} from 'react'
 import {Scrollbars} from 'react-custom-scrollbars'
-import Peer from 'simple-peer'
+import SimplePeer from 'simple-peer'
+import {Buffer} from 'buffer/'
 import './App.css'
 
 class Terminal extends Component {
@@ -21,6 +22,7 @@ class Terminal extends Component {
   registerCommands() {
     this.setState({
       commands: {
+        'signal': this.setSignal,
         'intro': this.showWelcomeMsg,
         'help': this.showHelp,
         'github': this.openLink('https://github.com/roccomuso'),
@@ -28,6 +30,31 @@ class Terminal extends Component {
         'clear': this.clearHistory
       }
     });
+  }
+
+  setSignal(data) {
+    var self = this
+    var intro = /^{/.test(data)
+        ? JSON.parse(data)
+        : JSON.parse(atob(data))
+
+    this.peer.signal(intro)
+    this.peer.once('signal', function (data) {
+      self.printOutput(['Copy and Paste this to the initiator:', btoa(JSON.stringify(data))])
+    })
+    this.peer.once('connect', function(){
+      self.printOutput('Connected!')
+    })
+    this.peer.on('data', function(data){ // Uint8Array
+      var buffer = Buffer.from(data)
+      self.printOutput(buffer.toString())
+    })
+    this.peer.once('error', function(err){
+      self.printOutput(err)
+    })
+    this.peer.once('close', function(){
+      self.printOutput('Connection closed!')
+    })
   }
 
   showWelcomeMsg() {
@@ -44,9 +71,10 @@ class Terminal extends Component {
   showHelp() {
     this.printOutput([
       "To start using this web-shell do the manual RTC handshake.",
-      "Paste here the webRTC base64 <b>introducer</b> generated from your rtc-shell tool.",
+      "Paste here the webRTC base64 introducer generated from your rtc-shell tool.",
       "Then press enter and do the same with the generated one on this page.",
-      "<b>Available internal commands</b>:",
+      "Available internal commands:",
+      "@signal - Paste the initiator's web-RTC signal",
       "@intro - show the welcome message",
       "@help - show this cruft",
       "@github - open the author github account",
@@ -57,6 +85,7 @@ class Terminal extends Component {
 
   componentDidMount() {
     var term = this.term
+    this.peer = new SimplePeer()
 
     this.registerCommands();
     this.showWelcomeMsg();
@@ -70,16 +99,19 @@ class Terminal extends Component {
   handleInput(e) {
     if (e.key === "Enter") {
       var input = this.term.value;
+      this.printOutput(this.state.prompt + " " + input);
+
       if (input.indexOf('@') === 0) {
         // internal cmd
-        this.printOutput(this.state.prompt + " " + input);
-        input = input.slice(1)
-        var command = this.state.commands[input];
-        if (!command) this.printOutput("sh: command not found: " + input);
+        input = input.slice(1).split(' ')
+        var cmd = input[0]
+        var arg = input[1]
+        var command = this.state.commands[cmd];
+        if (!command) this.printOutput("sh: command not found: " + cmd);
         else
-        command.call(this, input.split(' ')[1]);
+        command.call(this, arg);
       } else {
-        this.sendCmd(input);
+        this.sendCmd(input + '\n');
       }
 
       this.clearInput();
@@ -87,8 +119,11 @@ class Terminal extends Component {
   }
 
   sendCmd (cmd) {
-    // TODO: webRTC send cmd.
-    this.peer.send(cmd)
+    // webRTC send cmd.
+    if (this.peer && this.peer.connected) this.peer.send(Buffer.from(cmd))
+    else {
+      this.printOutput('Client is disconnected!')
+    }
   }
 
   clearInput() {
