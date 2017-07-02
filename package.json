@@ -1,0 +1,24 @@
+{
+  "name": "react-web-terminal",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "react": "^15.6.1",
+    "react-custom-scrollbars": "^4.1.2",
+    "react-dom": "^15.6.1",
+    "react-scripts": "1.0.8",
+    "simple-peer": "^8.1.1"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test --env=jsdom",
+    "eject": "react-scripts eject"
+  },
+  "author": "Rocco Musolino",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/roccomuso/react-web-terminal/issues"
+  },
+  "homepage": "https://github.com/roccomuso/react-web-terminal#readme"
+}
