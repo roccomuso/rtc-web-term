@@ -4,6 +4,8 @@ import SimplePeer from 'simple-peer'
 import {Buffer} from 'buffer/'
 import './App.css'
 
+var debug = require('debug')('rtc-web-term')
+
 class Terminal extends Component {
 
   constructor(props) {
@@ -23,6 +25,7 @@ class Terminal extends Component {
     this.setState({
       commands: {
         'signal': this.setSignal,
+        'disconnect': this.disconnect,
         'intro': this.showWelcomeMsg,
         'help': this.showHelp,
         'github': this.openLink('https://github.com/roccomuso'),
@@ -30,6 +33,13 @@ class Terminal extends Component {
         'clear': this.clearHistory
       }
     });
+  }
+
+  registerShortcuts() {
+    var self = this
+    debug('Peer instance:', self.peer)
+    // TODO: bind to Ctrl+C
+
   }
 
   setSignal(data) {
@@ -55,6 +65,11 @@ class Terminal extends Component {
     this.peer.once('close', function(){
       self.printOutput('Connection closed!')
     })
+  }
+
+  disconnect(){
+    debug('Disconnecting...')
+    this.peer.destroy()
   }
 
   showWelcomeMsg() {
@@ -87,9 +102,10 @@ class Terminal extends Component {
     var term = this.term
     this.peer = new SimplePeer()
 
-    this.registerCommands();
-    this.showWelcomeMsg();
-    term.focus();
+    this.registerCommands()
+    this.registerShortcuts()
+    this.showWelcomeMsg()
+    term.focus()
   }
 
   componentDidUpdate() {
