@@ -35,6 +35,7 @@ input[type=text], input[type=text]:focus {
 p {
   margin-bottom: 0;
   line-height: 21px;
+  word-wrap: break-word;
 }
 
 #bar {
