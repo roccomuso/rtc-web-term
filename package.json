@@ -1,7 +1,7 @@
 {
   "name": "react-web-terminal",
+  "description": "React web terminal",
   "version": "0.1.0",
-  "private": true,
   "dependencies": {
     "buffer": "^5.0.6",
     "debug": "^2.6.8",
@@ -17,7 +17,17 @@
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject"
   },
-  "author": "Rocco Musolino",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/roccomuso/react-web-terminal.git"
+  },
+  "keywords": [
+    "web-terminal",
+    "react",
+    "terminal",
+    "tty"
+  ],
+  "author": "Rocco Musolino (roccomuso)",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/roccomuso/react-web-terminal/issues"
