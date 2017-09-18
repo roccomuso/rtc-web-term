@@ -1,7 +1,7 @@
 {
   "name": "rtc-web-term",
   "description": "React webRTC web terminal",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "dependencies": {
     "buffer": "^5.0.6",
     "debug": "^2.6.8",
